@@ -33,7 +33,8 @@ EXPOSE 7000
 EXPOSE 7001
 
 # The Hawkular Metrics Version
-ENV HAWKULAR_METRICS_VERSION 0.3.2-SNAPSHOT
+ENV HAWKULAR_METRICS_VERSION 0.3.4-SNAPSHOT
+
 # The Cassandra version
 ENV CASSANDRA_VERSION 2.1.3
 
@@ -59,12 +60,15 @@ RUN cd /opt; \
 # Copy our version of the cassandra configuration file over to the filesystem
 COPY cassandra.yaml /opt/apache-cassandra/conf/cassandra.yaml
 
-# Copy our customized run script over to the cassandra bin directory
-COPY cassandra-docker.sh /opt/apache-cassandra/bin/
-
 # Copy the jar containing the Cassandra seed provider
 RUN cd $CASSANDRA_HOME/lib && \
     curl -Lo cassandra-seed-provider.jar https://origin-repository.jboss.org/nexus/service/local/artifact/maven/content?r=public\&g=org.hawkular.metrics\&a=cassandra-seed-provider\&e=jar&v=${HAWKULAR_METRICS_VERSION}
+
+# Copy our customized run script over to the cassandra bin directory
+COPY cassandra-docker.sh /opt/apache-cassandra/bin/
+
+# Copy the preStop scriptover to the cassandra bin directory
+COPY cassandra-docker-pre-stop.sh /opt/apache-cassandra/bin/
 
 # TODO: remove this line once https://bugzilla.redhat.com/show_bug.cgi?id=1201848 has been fixed
 ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
